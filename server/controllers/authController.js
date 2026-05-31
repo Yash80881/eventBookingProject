@@ -35,7 +35,7 @@ const registerUser = async (req,res) =>{
         email: user.email
         })
         
-    }catch(err){
+    }catch(error){
         res.status(400).json({error:error.message});
     }
 }
@@ -76,22 +76,22 @@ const loginUser = async (req,res) =>{
             
         
     }
-    catch(err){
+    catch(error){
         res.status(400).json({error:error.message});
     }
 }
 
 const verifyOtp = async (req,res) =>{
     const {email,otp} = req.body;
-    const optRecord = await OTP.findOne({email,otp,action:'account_verification'});
+    // console.log('verifyOtp request body:', req.body);
+    const otpRecord = await OTP.findOne({email,otp,action:'account_verification'});
+    // console.log('verifyOtp db lookup otpRecord:', otpRecord);
 
-    if(!optRecord){
+    if(!otpRecord){
         return res.status(400).json({error:'Invalid or expired otp.'});
     }
 
-
-    
-    const user =    await User.findOneAndUpdate({email},{isVerified:true});
+    const user = await User.findOneAndUpdate({email},{isVerified:true},{new:true});
     await OTP.deleteMany({email,action:'account_verification'}); // remove used otps
     res.json({
         message: 'Account verified successfully. You can now log in.',

@@ -11,7 +11,7 @@ router.get('/',getAllEvents);
 router.get('/:id',getEventById);
 
 //create event (admin only)
-router.post('/:id',protect,admin,createEvent);
+router.post('/',protect,admin,createEvent);
 
 //update event (admin only)
 router.put('/:id',protect,admin,updateEvent);
