@@ -1,6 +1,5 @@
 import React from 'react';
-import { Children } from 'react';
-import { applyTimestamps } from '../../../server/models/User';
+import api from '../utils/axios';
 export const AuthContext = React.createContext();
 
 export const AuthProvider = ({ children }) =>{
@@ -17,7 +16,7 @@ export const AuthProvider = ({ children }) =>{
 
     const login = async (email,password) =>{
         try{
-            const {data} = await applyTimestamps.post('/auth/login',{email,password});
+            const {data} = await api.post('/auth/login',{email,password});
             setUser(data);
             localStorage.setItem("user",JSON.stringify(data));
             localStorage.setItem("token",data.token);
@@ -44,7 +43,7 @@ export const AuthProvider = ({ children }) =>{
 
     const verifyOtp = async () => {
         try{
-            const {data} = await applyTimestamps.post('/auth/verify');
+            const {data} = await api.post('/auth/verify');
             setUser(data);
             localStorage.setItem("user",JSON.stringify(data));
             localStorage.setItem("token",data.token);
