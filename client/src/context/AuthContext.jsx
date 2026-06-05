@@ -24,7 +24,13 @@ export const AuthProvider = ({ children }) =>{
         }
         catch(err){
             console.error("Login failed:",err);
-            throw err;
+            // Normalize server response for unverified accounts
+            const serverMessage = err?.response?.data?.error || err.message || err;
+            const e = new Error(serverMessage);
+            if (typeof serverMessage === 'string' && serverMessage.toLowerCase().includes('not verified')) {
+                e.needsVerification = true;
+            }
+            throw e;
         }
         
     };
@@ -32,18 +38,19 @@ export const AuthProvider = ({ children }) =>{
     const register = async (name,email,password) => {
         try{
             const {data} = await api.post('/auth/register',{ name, email, password});
-            setUser(data);
+            // Server returns a message and email; do not set authenticated user here
             return data;
         }
         catch(err){
             console.error("Registration failed:",err);
-            throw err;
+            const serverMessage = err?.response?.data?.error || err.message || err;
+            throw new Error(serverMessage);
         }
     }
 
-    const verifyOtp = async () => {
+    const verifyOtp = async (email, otp) => {
         try{
-            const {data} = await api.post('/auth/verify');
+            const {data} = await api.post('/auth/verify',{ email, otp });
             setUser(data);
             localStorage.setItem("user",JSON.stringify(data));
             localStorage.setItem("token",data.token);
@@ -51,7 +58,8 @@ export const AuthProvider = ({ children }) =>{
         }
         catch(err){
             console.error("OTP verification failed:",err);
-            throw err;
+            const serverMessage = err?.response?.data?.error || err.message || err;
+            throw new Error(serverMessage);
         }
     }
 
@@ -62,7 +70,7 @@ export const AuthProvider = ({ children }) =>{
     };
 
     return (
-        <AuthContext.Provider value = {{user, loading, login, logout, verifyOtp, register}}>
+        <AuthContext.Provider value = {{user, loading, login, logout, verifyOtp, verifyOTP: verifyOtp, register}}>
             {children}
         </AuthContext.Provider>
     );

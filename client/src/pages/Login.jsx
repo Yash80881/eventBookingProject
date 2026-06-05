@@ -19,10 +19,18 @@ const Login = () => {
         setError('');
         try {
             if (!showOTP) {
+                if(!email.trim() || !password.trim()){
+                    setError('Please enter email and password');
+                    return;
+                }
                 const data = await login(email, password);
                 if (data.role === 'admin') navigate('/admin');
                 else navigate('/dashboard');
             } else {
+                if(!email.trim() || !otp.trim()){
+                    setError('Please provide the verification code');
+                    return;
+                }
                 const data = await verifyOTP(email, otp);
                 if (data.role === 'admin') navigate('/admin');
                 else navigate('/dashboard');
@@ -32,7 +40,7 @@ const Login = () => {
                 setShowOTP(true);
                 setError('Account not verified. A new OTP has been sent to your email.');
             } else {
-                setError(err.message || err);
+                setError(err.message || String(err));
             }
         } finally {
             setLoading(false);
@@ -55,6 +63,8 @@ const Login = () => {
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
                             <input
                                 type="email"
+                                name="email"
+                                autoComplete="email"
                                 required
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-700 focus:border-gray-700 transition shadow-sm"
                                 value={email}
@@ -65,6 +75,8 @@ const Login = () => {
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
                             <input
                                 type="password"
+                                name="password"
+                                autoComplete="current-password"
                                 required
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-700 focus:border-gray-700 transition shadow-sm"
                                 value={password}
@@ -77,6 +89,8 @@ const Login = () => {
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Verification Code (OTP)</label>
                         <input
                             type="text"
+                            name="otp"
+                            autoComplete="one-time-code"
                             required
                             placeholder="6-digit code"
                             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-700 transition shadow-sm font-bold tracking-widest text-center text-lg"

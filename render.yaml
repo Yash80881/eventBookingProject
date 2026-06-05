@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: eventora
+    env: docker
+    plan: standard
+    region: oregon
+    docker:
+      dockerfilePath: Dockerfile
+    envVars:
+      - key: MONGO_URL
+        value: '<YOUR_MONGO_URL>'
+      - key: JWT_SECRET
+        value: '<YOUR_JWT_SECRET>'
+      - key: EMAIL_USER
+        value: '<YOUR_EMAIL_USER>'
+      - key: EMAIL_PASS
+        value: '<YOUR_EMAIL_PASS>'
+      - key: PORT
+        value: '5000'
+    buildCommand: null
+    startCommand: null

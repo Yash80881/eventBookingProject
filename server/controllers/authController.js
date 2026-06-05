@@ -4,10 +4,11 @@ const bcrypt = require('bcryptjs');
 const {sendOtpEmail} = require('../utils/email');
 const jwt = require('jsonwebtoken');
 
-
-const generateToken = (id,role) => {
-    return jwt.sign({id,role},process.env.JWT_SECRET,{expiresIn: '7d'});
+const generateToken = (id, role) => {
+    return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '7d' });
 }
+
+const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 //register user
 const registerUser = async (req,res) =>{
@@ -24,11 +25,11 @@ const registerUser = async (req,res) =>{
     try{
         const user = await User.create({name,email,password:hashPassword,role:'user',isVerified: false});
         
-        const otp = Math.floor( Math.random() * 900000).toString();
+        const otp = generateOtp();
         console.log(`Otp for ${email}: ${otp}`);
-        await OTP.create({email,otp,action:'account_verification'});
+        await OTP.create({ email, otp, action: 'account_verification' });
 
-        await sendOtpEmail(email,otp,'account_verification');
+        await sendOtpEmail(email, otp, 'account_verification');
 
         res.status(201).json({
             message: 'User registered successfully. Please check your email for OTP to verify your account',
@@ -55,11 +56,11 @@ const loginUser = async (req,res) =>{
             return res.status(400).json({error:'Invalid credentials'});
         }
         if(!user.isVerified && user.role === 'user'){
-            const otp = Math.floor( Math.random() * 900000).toString();
+            const otp = generateOtp();
 
-            await OTP.deleteMany({email,action:'account_verification'}); //remove old otps
-            await OTP.create({email,otp,action:'account_verification'});
-            await sendOtpEmail(email,otp,'account_verification');
+            await OTP.deleteMany({ email, action: 'account_verification' }); // remove old otps
+            await OTP.create({ email, otp, action: 'account_verification' });
+            await sendOtpEmail(email, otp, 'account_verification');
             return res.status(400).json({
                 error:'Account not verified . A new otp has been sent to your email.'
             })

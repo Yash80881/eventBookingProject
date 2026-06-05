@@ -16,8 +16,8 @@ const sendBookingEmail = async (userEmail,userName,eventTitle) =>{
             from: process.env.EMAIL_USER,
             to: userEmail,
             subject: `Booking Confirmed : ${eventTitle}`,
-            html:`<h2> Hi ${userName} !</h2>
-            <p><Your booking for the event <strong>${eventTitle}</strong> is successfully confirmed.</p>
+            html:`<h2>Hi ${userName}!</h2>
+            <p>Your booking for the event <strong>${eventTitle}</strong> is successfully confirmed.</p>
             <p>Thank you for choosing eventora</p>`
         };
 
@@ -25,7 +25,7 @@ const sendBookingEmail = async (userEmail,userName,eventTitle) =>{
         console.log(`email successfully sent to ${userEmail}`);
     }
     catch(error){
-        console.error('Error sending email to ${userEmail}:',error);
+        console.error(`Error sending email to ${userEmail}:`, error);
     }
 }
 

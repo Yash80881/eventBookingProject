@@ -20,16 +20,25 @@ const Register = () => {
         setError('');
         try{
             if(!showOTP) {
+                // Validate on client before sending
+                if(!name.trim() || !email.trim() || !password.trim()){
+                    setError('Please fill in name, email and password');
+                    return;
+                }
                 await register(name,email,password);
                 setShowOTP(true);
                 setError('');
             }else{
+                if(!email.trim() || !otp.trim()){
+                    setError('Please provide the verification code sent to your email');
+                    return;
+                }
                 await verifyOTP(email,otp);
                 navigate('/dashboard');
             }
         }
         catch(err){
-            setError(err);
+            setError(err?.message || String(err));
         }
         finally{
             setLoading(false);
@@ -52,6 +61,8 @@ const Register = () => {
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
                             <input
                                 type="text"
+                                name="name"
+                                autoComplete="name"
                                 required
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-700 transition shadow-sm"
                                 value={name}
@@ -62,6 +73,8 @@ const Register = () => {
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
                             <input
                                 type="email"
+                                name="email"
+                                autoComplete="email"
                                 required
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-700 transition shadow-sm"
                                 value={email}
@@ -72,6 +85,8 @@ const Register = () => {
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
                             <input
                                 type="password"
+                                name="password"
+                                autoComplete="new-password"
                                 required
                                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-700 transition shadow-sm"
                                 value={password}
@@ -87,6 +102,8 @@ const Register = () => {
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Verification Code (OTP)</label>
                         <input
                             type="text"
+                            name="otp"
+                            autoComplete="one-time-code"
                             required
                             placeholder="6-digit code"
                             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-gray-700 transition shadow-sm font-bold tracking-widest text-center text-lg"

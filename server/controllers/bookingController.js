@@ -37,7 +37,7 @@ const bookEvent = async (req,res) =>{
 
         const bookingExists = await Booking.findOne({userId:req.user._id,eventId});
         if(bookingExists){
-            return res.status(400).json({error:'Booking already exists'},bookingExists);
+            return res.status(400).json({error:'Booking already exists', booking: bookingExists});
         }
 
         const booking = await Booking.create({
@@ -47,11 +47,8 @@ const bookEvent = async (req,res) =>{
             paymentStatus:'not_paid',
             amount:event.ticketPrice
         });
-
         await OTP.deleteMany({email:req.user.email, action:'event_booking'});
-         res.status(201).json({message:'Booking created. Please check your email for status.'
-            
-         },booking);
+        res.status(201).json({message:'Booking created. Please check your email for status.', booking});
 
 
         
@@ -69,7 +66,7 @@ const confirmBooking = async (req, res) =>{
         }
         const booking = await Booking.findById(req.params.id)
             .populate('eventId')
-            .populate('userId', 'email');
+            .populate('userId', 'name email');
         if(!booking){
            return res.status(400).json({message: 'Booking not found'});
         }
@@ -88,7 +85,7 @@ const confirmBooking = async (req, res) =>{
 
         event.availableSeats = availableSeats - 1;
         await event.save();
-        await sendBookingEmail(booking.userId.email, event.title, booking._id);
+        await sendBookingEmail(booking.userId.email, booking.userId.name, event.title);
 
         res.json({message:'Booking confirmed'});
     }
