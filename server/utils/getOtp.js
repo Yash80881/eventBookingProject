@@ -2,7 +2,7 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const mongoose = require('mongoose');
 
-const OTP = require('./models/OTP');
+const OTP = require('../models/OTP');
 
 async function main() {
   const email = process.argv[2];

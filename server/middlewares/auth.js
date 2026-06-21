@@ -1,36 +1,31 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User.js');
+const User = require('../models/User');
 
-
-//user authorization middleware
-//check whether user is login
-const protect = async (req,res,next) =>{
-    let token = req.headers.authorization && req.headers.authorization.startsWith('Bearer') ? req.headers.authorization.split(' ')[1] : null;
-    if(token){
-        try{
+const protect = async (req, res, next) => {
+    let token = req.headers.authorization;
+    if (token && token.startsWith('Bearer')) {
+        try {
+            token = token.split(' ')[1];
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             req.user = await User.findById(decoded.id).select('-password');
-            if(!req.user){
-                return res.status(401).json({message:'Not authorised , user not found'});
+            if (!req.user) {
+                return res.status(401).json({ message: 'Not authorized, user not found' });
             }
-            next();        
-        }
-        catch(error){
-            return res.status(401).json({ message: 'Not authorised, token failed' });
+            next();
+        } catch (error) {
+            res.status(401).json({ message: 'Not authorized, token failed' });
         }
     } else {
-        return res.status(401).json({ message: 'Not authorised, no token' });
+        res.status(401).json({ message: 'Not authorized, no token' });
     }
-}
+};
 
-const admin =  async (req,res,next) =>{
-    if(req.user && req.user.role === 'admin'){
+const admin = (req, res, next) => {
+    if (req.user && req.user.role === 'admin') {
         next();
+    } else {
+        res.status(403).json({ message: 'Not authorized as an admin' });
     }
-    else{
-        return res.status(401).json({message:'Forbidden ! Admin access required'});
-    }
-}
+};
 
-module.exports = { protect , admin};
-
+module.exports = { protect, admin };
