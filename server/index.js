@@ -20,12 +20,12 @@ app.use('/api/events',eventRoutes);
 app.use('/api/bookings',bookingRoutes);
 
 // Serve client build in production
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, 'public')));
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, 'public', 'index.html'));
-    });
-}
+// if (process.env.NODE_ENV === 'production') {
+//     app.use(express.static(path.join(__dirname, 'public')));
+//     app.get('*', (req, res) => {
+//         res.sendFile(path.join(__dirname, 'public', 'index.html'));
+//     });
+// }
 
 mongoose.connect(process.env.MONGO_URL)
 .then(()=>{
