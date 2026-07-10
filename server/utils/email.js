@@ -15,6 +15,9 @@ const buildTransporter = () => {
             host: smtpHost,
             port: smtpPort,
             secure: String(process.env.SMTP_SECURE || 'false').toLowerCase() === 'true',
+            connectionTimeout: 10000,
+            greetingTimeout: 10000,
+            socketTimeout: 10000,
             auth: {
                 user: emailUser,
                 pass: emailPass
@@ -24,6 +27,9 @@ const buildTransporter = () => {
 
     return nodemailer.createTransport({
         service: 'gmail',
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 10000,
         auth: {
             user: emailUser,
             pass: emailPass
@@ -45,7 +51,6 @@ const sendMail = async (mailOptions) => {
         throw new Error('Email credentials are missing. Set SMTP_HOST/SMTP_USER/SMTP_PASS or EMAIL_USER/EMAIL_PASS in deployment.');
     }
 
-    await transporter.verify();
     await transporter.sendMail(mailOptions);
 };
 
