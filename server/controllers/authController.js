@@ -29,7 +29,17 @@ exports.register = async (req, res) => {
 
         const otp = generateOTP();
         await OTP.create({ email, otp, action: 'account_verification' });
-        await sendOTPEmail(email, otp, 'account_verification');
+
+        try {
+            await sendOTPEmail(email, otp, 'account_verification');
+        } catch (error) {
+            await User.findByIdAndDelete(user._id);
+            await OTP.deleteOne({ email, action: 'account_verification' });
+            return res.status(502).json({
+                message: 'Unable to send verification OTP. Please check the email configuration.',
+                error: error.message
+            });
+        }
 
         res.status(201).json({
             message: 'OTP sent to email. Please verify.',
@@ -53,7 +63,16 @@ exports.login = async (req, res) => {
             const otp = generateOTP();
             await OTP.findOneAndDelete({ email: user.email, action: 'account_verification' });
             await OTP.create({ email: user.email, otp, action: 'account_verification' });
-            await sendOTPEmail(user.email, otp, 'account_verification');
+
+            try {
+                await sendOTPEmail(user.email, otp, 'account_verification');
+            } catch (error) {
+                return res.status(502).json({
+                    message: 'Unable to send verification OTP. Please check the email configuration.',
+                    error: error.message
+                });
+            }
+
             return res.status(403).json({ message: 'Account not verified', needsVerification: true, email: user.email });
         }
 
