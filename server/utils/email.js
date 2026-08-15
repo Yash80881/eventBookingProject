@@ -15,6 +15,7 @@ const buildTransporter = () => {
             host: smtpHost,
             port: smtpPort,
             secure: String(process.env.SMTP_SECURE || 'false').toLowerCase() === 'true',
+            family : 4,
             connectionTimeout: 10000,
             greetingTimeout: 10000,
             socketTimeout: 10000,
@@ -27,6 +28,7 @@ const buildTransporter = () => {
 
     return nodemailer.createTransport({
         service: 'gmail',
+        family: 4,
         connectionTimeout: 10000,
         greetingTimeout: 10000,
         socketTimeout: 10000,
