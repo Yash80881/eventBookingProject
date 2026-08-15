@@ -1,14 +1,12 @@
-const SibApiV3Sdk = require('@getbrevo/brevo');
+const { BrevoClient } = require('@getbrevo/brevo');
 const dotenv = require('dotenv');
 const path = require('path');
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-apiInstance.setApiKey(
-    SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
-    process.env.BREVO_API_KEY
-);
+const brevo = new BrevoClient({
+    apiKey: process.env.BREVO_API_KEY
+});
 
 const getSenderEmail = () => process.env.EMAIL_FROM || process.env.EMAIL_USER;
 
@@ -23,7 +21,7 @@ const sendMail = async ({ to, subject, html }) => {
         throw new Error('Brevo API key is missing. Set BREVO_API_KEY in deployment.');
     }
 
-    await apiInstance.sendTransacEmail({
+    await brevo.transactionalEmails.sendTransacEmail({
         sender: { email: senderEmail, name: 'Eventora' },
         to: [{ email: to }],
         subject,
